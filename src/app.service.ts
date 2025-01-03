@@ -22,7 +22,7 @@ export class AppService {
       internet: log.internet,
       battery: log.battery,
       tempInternal: log.tempInternal,
-      extMemory: log.extMemory,
+      extMemory: log.extMemory
     };
     const tags = { sn: log.serial, probe: log.probe };
     await this.influxdb.writeData("logdays", fields, tags, new Date(message.sendTime));

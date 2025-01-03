@@ -22,9 +22,8 @@ export class InfluxdbService implements OnModuleInit {
     });
 
     Object.entries(tags).forEach(([key, value]) => { point.tag(key, value) });
-
-    if (timestamp) point.timestamp(timestamp);
-
+    
+    // if (timestamp) point.timestamp(timestamp);
     this.writeApi.writePoint(point);
     await this.writeApi.flush();
   }
