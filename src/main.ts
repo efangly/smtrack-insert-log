@@ -4,14 +4,14 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const microservice = app.connectMicroservice<MicroserviceOptions>({
+  const microservice = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
     transport: Transport.RMQ,
     options: {
       urls: [process.env.RABBITMQ],
-      queue: process.env.NODE_ENV === "production" ? 'logday' : 'logday-test',
+      queue: 'log_queue',
       queueOptions: { durable: true },
-      prefetchCount: 10,
-      noAck: false
+      noAck: false,
+      prefetchCount: 1
     },
   });
   await microservice.listen();

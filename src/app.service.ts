@@ -8,7 +8,6 @@ import { dateFormat } from './utils';
 export class AppService {
   constructor(private readonly prisma: PrismaService, private readonly influxdb: InfluxdbService) {}
   async createLogday(message: CreateLogDto) {
-    console.log('Received message:', message);
     message.createAt = dateFormat(new Date());
     message.updateAt = dateFormat(new Date());
     const log = await this.prisma.logDays.create({ data: message });

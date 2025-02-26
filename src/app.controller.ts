@@ -1,16 +1,23 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { AppService } from './app.service';
-import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { CreateLogDto } from './dto/insert.dto';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
-  @MessagePattern() // Routing key
-    async handleMessage(@Payload() message: any, @Ctx() context: RmqContext) {
-      await this.appService.createLogday(message as CreateLogDto);
+  private readonly logger = new Logger(AppController.name);
+
+  @EventPattern('logday')
+    async handleMessage(@Payload() data: CreateLogDto, @Ctx() context: RmqContext) {
       const channel = context.getChannelRef();
-      const originalMsg = context.getMessage();
-      channel.ack(originalMsg);
+      const message = context.getMessage();
+      try {
+        await this.appService.createLogday(data);
+        channel.ack(message);
+      } catch (error) {
+        this.logger.error(error);
+        channel.nack(message, false, false);
+      }
     }
 }

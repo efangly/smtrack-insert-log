@@ -4,12 +4,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model LogDays {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  id              String   @id @default(uuid())
   serial          String
   temp            Float    @default(0.00)
   tempDisplay     Float    @default(0.00)
@@ -25,6 +25,24 @@ model LogDays {
   battery         Int      @default(0)
   tempInternal    Float?   @default(0.00)
   extMemory       Boolean  @default(false)
+  device          Devices  @relation(fields: [serial], references: [serial])
   createAt        DateTime @default(now())
   updateAt        DateTime @default(now()) @updatedAt
+}
+
+model Devices {
+  id           String          @id @default(uuid())
+  serial       String          @unique
+  ward         String
+  hospital     String
+  staticName   String
+  name         String?
+  status       Boolean
+  seq          Int
+  firmware     String
+  remark       String?
+  online       Boolean         @default(false)
+  log          LogDays[]
+  createAt     DateTime
+  updateAt     DateTime
 }
