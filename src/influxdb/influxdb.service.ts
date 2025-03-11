@@ -1,5 +1,6 @@
 import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { InfluxDB, Point, WriteApi } from '@influxdata/influxdb-client';
+import { format, toDate } from "date-fns";
 
 @Injectable()
 export class InfluxdbService implements OnModuleInit {
@@ -20,15 +21,13 @@ export class InfluxdbService implements OnModuleInit {
         point.stringField(key, value);
       }
     });
-
     Object.entries(tags).forEach(([key, value]) => { point.tag(key, value) });
-    
-    // if (timestamp) point.timestamp(timestamp);
+    if (timestamp) point.timestamp((timestamp.getTime() + 5 * 60 * 60 * 1000) * 1_000_000);
     this.writeApi.writePoint(point);
     await this.writeApi.flush();
   }
 
   onModuleInit() {
-    this.writeApi = this.influxDB.getWriteApi(this.org, this.bucket);
+    this.writeApi = this.influxDB.getWriteApi(this.org, this.bucket, 'ns');
   }
 }

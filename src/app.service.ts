@@ -4,7 +4,6 @@ import { PrismaService } from './prisma/prisma.service';
 import { InfluxdbService } from './influxdb/influxdb.service';
 import { CreateLogDto } from './dto/insert.dto';
 import { dateFormat } from './utils';
-import { BackupLogDto } from './dto/backup.dto';
 
 @Injectable()
 export class AppService {
@@ -29,7 +28,7 @@ export class AppService {
       tempInternal: log.tempInternal,
       extMemory: log.extMemory
     };
-    const tags = { sn: log.serial, probe: log.probe };
+    const tags = { static: log.device.staticName, sn: log.serial, probe: log.probe };
     await this.influxdb.writeData("logdays", fields, tags, new Date(message.sendTime));
     this.log.emit('logday-backup', {
       serial: log.serial,
