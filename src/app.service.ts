@@ -4,6 +4,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { InfluxdbService } from './influxdb/influxdb.service';
 import { CreateLogDto } from './dto/insert.dto';
 import { dateFormat } from './utils';
+import { CreateHistoryDto } from './dto/history.dto';
 
 @Injectable()
 export class AppService {
@@ -12,9 +13,11 @@ export class AppService {
     private readonly prisma: PrismaService, 
     private readonly influxdb: InfluxdbService
   ) {}
+
   async createLogday(message: CreateLogDto) {
     message.createAt = dateFormat(new Date());
     message.updateAt = dateFormat(new Date());
+    message.sendTime = dateFormat(new Date(message.sendTime));
     const log = await this.prisma.logDays.create({ data: message, include: { device: true } });
     const fields = {
       temp: log.tempDisplay,
@@ -51,4 +54,10 @@ export class AppService {
       updateAt: log.updateAt
     });
   }
-}
+
+  async createHistory(data: CreateHistoryDto) {
+    const tags = { service: data.service, type: data.type, user: data.user };
+    const fields = { message: data.message };
+    await this.influxdb.writeData('history', fields, tags, new Date(data.time));
+  }
+} 
