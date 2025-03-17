@@ -15,9 +15,10 @@ export class AppService {
   ) {}
 
   async createLogday(message: CreateLogDto) {
+    const time = message.sendTime;
     message.createAt = dateFormat(new Date());
     message.updateAt = dateFormat(new Date());
-    message.sendTime = dateFormat(new Date(message.sendTime));
+    message.sendTime = dateFormat(message.sendTime);
     const log = await this.prisma.logDays.create({ data: message, include: { device: true } });
     const fields = {
       temp: log.tempDisplay,
@@ -32,7 +33,7 @@ export class AppService {
       extMemory: log.extMemory
     };
     const tags = { static: log.device.staticName, sn: log.serial, probe: log.probe };
-    await this.influxdb.writeData("logdays", fields, tags, new Date(message.sendTime));
+    await this.influxdb.writeData("logdays", fields, tags, time);
     this.log.emit('logday-backup', {
       serial: log.serial,
       staticName: log.device.staticName,
