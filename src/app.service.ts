@@ -59,6 +59,6 @@ export class AppService {
   async createHistory(data: CreateHistoryDto) {
     const tags = { service: data.service, type: data.type, user: data.user };
     const fields = { message: data.message };
-    await this.influxdb.writeData('history', fields, tags, new Date(data.time));
+    await this.influxdb.writeData('history', fields, tags, data.time);
   }
 } 
