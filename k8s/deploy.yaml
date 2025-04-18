@@ -16,7 +16,6 @@ spec:
       containers:
       - name: insert-log
         image: siamatic/smtrack-insert-log:latest
-        imagePullPolicy: Always
         readinessProbe:
           httpGet:
             path: /health
