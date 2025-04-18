@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: insert-log
-        image: siamatic/smtrack-insert-log:latest
+        image: siamatic/smtrack-insert-log:1.0.0
         readinessProbe:
           httpGet:
             path: /health
